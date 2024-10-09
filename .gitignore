@@ -1,0 +1,6 @@
+.idea
+.nimcache*
+nimcliboard
+*.bin
+*.hex
+*.elf
