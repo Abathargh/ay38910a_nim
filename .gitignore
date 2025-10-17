@@ -4,3 +4,6 @@ nimcliboard
 *.bin
 *.hex
 *.elf
+nimble.develop
+nimble.paths
+nimbledeps
