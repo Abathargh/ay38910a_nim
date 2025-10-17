@@ -10,8 +10,7 @@ bin           = @["ay38910a"]
 # Dependencies
 
 requires "nim >= 2.0.8"
-requires "avr_io >= 0.3.0"
-requires "serial >= 1.2.0"
+requires "avr_io >= 0.5.1"
 
 after build:
   mvFile(bin[0], bin[0] & ".elf")
