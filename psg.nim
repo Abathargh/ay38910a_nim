@@ -1,22 +1,23 @@
+import std/[bitops, math]
+
 import avr_io
-import bitops
+import writer
 import delay
 
-import std/math
+# TODO add docstrings from c proj
 
 const 
-  octaves* = 8
+  octaves*     = 8
   notes_in_oct = 12
-  tot_notes = notes_in_oct * octaves + 1
-
+  tot_notes    = notes_in_oct * octaves + 1
 
 proc generate_magic_notes(): array[tot_notes, uint16] =
   const
-    b4_idx = 2 # A4 = 0 => B4 = 2
-    b0_idx = (b4_idx - (4 * notes_in_oct)).int16
-    b8_idx = (b4_idx + (4 * notes_in_oct)).int16
+    b4_idx  = 2               # A4 = 0 => B4 = 2
+    b0_idx  = (b4_idx - (4 * notes_in_oct)).int16
+    b8_idx  = (b4_idx + (4 * notes_in_oct)).int16
     freq_a4 = 440 # Hz
-    f_clk = 2_000_000.uint32 # Hz
+    f_clk   = 2_000_000.uint32 # Hz
 
   template freq(n: int16): float32 =
     freq_a4.float32 * (2.0.pow(1.0 / 12)).pow(n.float32)
@@ -41,12 +42,12 @@ const
 
 
 type
-  ay38910a* {.byref.} = object
-    bc1Pin*: uint8
-    bdirPin*: uint8
-    ctlPort*: Port
-    dataPort*: Port
-  
+  ay38910a*[T: WriterU8] {.byref.} = object
+    bc1*:  uint8
+    bdir*: uint8
+    ctl*: Port
+    writer*:  T
+
   channel* = enum
     CHAN_A = 0
     CHAN_B = 1
@@ -76,7 +77,8 @@ type
     A_NOTE       = 10
     A_SHARP_NOTE = 11
 
-
+# TODO opt: same trick as port_value for static ints, so no need to do this
+# TODO crazy masking
 template octave*(n: Note, octave: Natural): uint8 =
   (((n.ord + 12*(octave)) mod tot_notes + tot_notes) mod tot_notes).uint8
 
@@ -86,42 +88,42 @@ template chanToAmplReg(c: channel): uint8 = uint8(ord(c) + 8)
 template toMask(m: channelModes): uint8 = cast[uint8](m)
 
 
-template inactiveMode(ay: ay38910a) = 
-  ay.ctlPort.clearPin(ay.bc1Pin)
+template inactiveMode(ay: ay38910a) =
+  ay.ctl.clearPin(ay.bc1)
   delayUs(1)
-  ay.ctlPort.clearPin(ay.bdirPin)
+  ay.ctl.clearPin(ay.bdir)
   delayUs(1)
 
 
 template writeMode(ay: ay38910a) = 
-  ay.ctlPort.clearPin(ay.bc1Pin)
+  ay.ctl.clearPin(ay.bc1)
   delayUs(1)
-  ay.ctlPort.setPin(ay.bdirPin)
+  ay.ctl.setPin(ay.bdir)
   delayUs(1)
 
 
 template latchAddrMode(ay: ay38910a) = 
-  ay.ctlPort.setPin(ay.bc1Pin)
+  ay.ctl.setPin(ay.bc1)
   delayUs(1)
-  ay.ctlPort.setPin(ay.bdirPin)
+  ay.ctl.setPin(ay.bdir)
   delayUs(1)
 
 
 proc writeData(ay: ay38910a; address, data: uint8) = 
   ay.inactiveMode()
-  ay.dataPort.setPortValue(address)
+  ay.writer.write(address)
   ay.latchAddrMode()
   ay.inactiveMode()
 
   ay.writeMode()
-  ay.dataPort.setPortValue(data)
+  ay.writer.write(data)
   ay.inactiveMode()
 
 
 proc init*(ay: ay38910a) =
-  ay.ctlPort.asOutputPin(ay.bc1Pin)
-  ay.ctlPort.asOutputPin(ay.bdirPin)
-  ay.dataPort.asOutputPort()
+  ay.ctl.asOutputPin(ay.bc1)
+  ay.ctl.asOutputPin(ay.bdir)
+  ay.writer.init()
 
 
 proc channelOn*(ay: sink ay38910a, m: channelModes) =
