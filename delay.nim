@@ -1,5 +1,5 @@
 {.push stackTrace:off.}
-proc delayUs*(us: cuint) {.inline.} =
+proc delay_us*(us: cuint) {.inline.} =
   asm """
     "MOV ZH,%B0\n\t"  // MOV: 1 cycle
     "MOV ZL,%A0\n\t"  // MOV: 1 cycle
@@ -25,7 +25,7 @@ proc delayUs*(us: cuint) {.inline.} =
 {.pop.}
 
 {.push stackTrace:off.}
-proc delayMs*(ms: cuint) {.inline.} =
+proc delay_ms*(ms: cuint) {.inline.} =
   asm """
     "MOV ZH,%B0\n\t"  // MOV: 1 cycle
     "MOV ZL,%A0\n\t"  // MOV: 1 cycle => 1 + (16012 + 4) * ms = rep*16016 + 1
