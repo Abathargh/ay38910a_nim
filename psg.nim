@@ -16,9 +16,9 @@ export writer
 
 
 const 
-  octaves*     = 8 ## Number of supported octaves.
-  notes_in_oct = 12
-  tot_notes    = notes_in_oct * octaves + 1
+  octaves*      = 8 ## Number of supported octaves.
+  notes_in_oct* = 12
+  tot_notes     = notes_in_oct * octaves + 1
 
 
 ## The AY38910A tone generation works in the following way: the clock signal
