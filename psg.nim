@@ -195,11 +195,6 @@ proc channel_on*(ay: sink Ay38910a, m: ChannelModes) =
   ay.write_data(MIXER_REG, bitops.bitnot(m.to_mask()))
 
 
-proc channel_off*(ay: Ay38910a, m: ChannelModes) =
-  ## Disables the channels specified in the passed bitset.
-  ay.write_data(MIXER_REG, m.to_mask())
-
-
 proc set_amplitude*(ay: Ay38910a, chan: Channel, amp: uint8, envelope = false) =
   ## Sets the amplitude for the specified channel.
   ##
