@@ -190,9 +190,11 @@ proc init*(ay: Ay38910a) =
   ay.writer.init()
 
 
-proc channel_on*(ay: sink Ay38910a, m: ChannelModes) =
-  ## Enables the channels specified in the passed bitset.
-  ay.write_data(MIXER_REG, bitops.bitnot(m.to_mask()))
+proc channel_on*(ay: Ay38910a, m: ChannelModes) =
+  ## Enables/disables the channels specified in the passed bitset. Enabling
+  ## a channel means that its corresponding bit is set to 0, disabling it to 1.
+  ## Thus, the negated logic.
+  ay.write_data(MIXER_REG, bitnot(m.to_mask()))
 
 
 proc set_amplitude*(ay: Ay38910a, chan: Channel, amp: uint8, envelope = false) =
