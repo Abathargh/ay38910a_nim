@@ -123,6 +123,7 @@ type
   EnvelopeShape* {.size: sizeof(uint8).} = enum ## \
     ## These are the only possible correct combinations of the envelope
     ## functions available in the PSG.
+    Off             = 0,                                 ## Envelope off
     ReverseSawtooth = FCONTINUE,                         ## \|\|\|\|\|\|\|\
     TriangularDown  = FCONTINUE or FALTERNATE,           ## \/\/\/\/\/\/\/\
     Gate            = FCONTINUE or FALTERNATE or FHOLD,  ## \/‾‾‾‾‾‾‾‾‾‾‾‾‾
