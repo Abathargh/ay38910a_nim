@@ -20,6 +20,8 @@ const
   notes_in_oct* = 12
   tot_notes     = notes_in_oct * octaves + 1
 
+  max_ampl*     = 0xf
+
 
 ## The AY38910A tone generation works in the following way: the clock signal
 ## gets scaled by a factor of 16 and by an additional factor depending on the
@@ -208,7 +210,7 @@ proc set_amplitude*(ay: Ay38910a, chan: Channel, amp: uint8, envelope = false) =
   ##
   ## Enabling the envelope filter disables the usage of fixed amplitude
   ## through bits[0:3].
-  let amplitude = (amp and 0x0f) or (if envelope: 0x10 else: 0x00)
+  let amplitude = (amp and max_ampl) or (if envelope: 0x10 else: 0x00)
   ay.write_data(chan_to_ampl_reg(chan), amplitude)
 
 
